@@ -1,0 +1,57 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
+
+body {
+  background-color: #2f4f30;
+  color: white;
+}
+
+header {
+  background-color: black;
+}
+
+.btn {
+  font-size: 1.5rem;
+}
+.titulo {
+  padding: 2rem;
+  text-align: center;
+}
+
+.game-card {
+  left: 5rem;
+  margin-left: -4.5rem;
+  position: relative;
+  width: 8rem;
+}
+
+#player-cards,
+#computer-cards {
+  height: 15rem;
+}
+
+/* Media-Queries */
+
+@media (min-width: 700px) {
+  .titulo {
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .game-card {
+    left: 10rem;
+    margin-left: -7.5rem;
+    position: relative;
+    width: 15rem;
+  }
+
+  #player-cards,
+  #computer-cards {
+    height: 24rem;
+  }
+}
+
