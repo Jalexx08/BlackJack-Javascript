@@ -11,41 +11,54 @@
       integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+
     <link rel="stylesheet" href="assets/css/style.css" />
+
     <title>BlackJack</title>
   </head>
   <body>
-      <header>
-          <h1 class="titulo display-1">BlackJack</h1>
-      </header>
-      <div class="row my-3">
-          <div class="col text-center">
-              <button id="btnNew" class="btn btn-success">Nuevo juego</button>
-              <button id="btnPull" class="btn btn-primary">Pedir carta</button>
-              <button id="btnStop" class="btn btn-danger">Detener</button>
-          </div>
+    <header>
+      <h1 class="titulo display-1">BlackJack</h1>
+    </header>
+    <div class="row my-3">
+      <div class="col text-center">
+        <button id="btnNew" class="btn btn-success">Nuevo juego</button>
+        <button id="btnPull" disabled="true" class="btn btn-primary">
+          Pedir carta
+        </button>
+        <button id="btnStop" disabled="true" class="btn btn-danger">
+          Detener
+        </button>
       </div>
+    </div>
 
-      <div class="container">
-          <div class="row">
-              <div class="col">
-                  <h2>Jugador 1 - <small>0</small></h2>
-                  <div id="player-cards">
-                      <!-- <img class="game-card" src="assets/cards/10H.png" alt="cards"> -->
-                  </div>
-              </div>
-          </div>
-          <div class="row">
-              <div class="col">
-                  <h2>Computadora 1 - <small>0</small></h2>
-                  <div id="computer-cards">
-                      <!-- <img class="game-card" src="assets/cards/JH.png" alt="cards"> -->
-                  </div>
-              </div>
-          </div>
-
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h2>Jugador 1 - <small>0</small></h2>
+          <div id="player-cards" class="divCards"></div>
+        </div>
       </div>
-      <script src="assets/js/underscore-min.js"></script>
-    <script src="assets/js/game.js"></script>
+      <div class="row">
+        <div class="col">
+          <h2>Computadora 1 - <small>0</small></h2>
+          <div id="computer-cards" class="divCards"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="assets/js/underscore-min.js"></script>
+    <script src="assets/js/game-min.js"></script>
+
+    <script>
+      document.querySelector("#btnNew").addEventListener("click", function () {
+        myModule.newGame();
+      });
+    </script>
   </body>
 </html>

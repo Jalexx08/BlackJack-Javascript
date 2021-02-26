@@ -1,167 +1,226 @@
-let deck = [];
-const kinds = ['C', 'D', 'H', 'S'];
-const specials = ['A', 'J', 'Q', 'K'];
 
-let playerScore = 0,
-    computerScore = 0;
+//* Usando patron modulo
 
-//* Referencias al HTML
+const myModule = (() => {
+    'use strict'
 
-const btnPull = document.querySelector('#btnPull');
-const btnNew = document.querySelector('#btnNew');
-const btnStop = document.querySelector('#btnStop');
+    let deck = [];
+    const kinds = ['C', 'D', 'H', 'S'],
+        specials = ['A', 'J', 'Q', 'K'];
 
-const scores = document.querySelectorAll('small');
-const divPlayerCards = document.querySelector('#player-cards');
-const divComputerCards = document.querySelector('#computer-cards');
+    let playersScore = [];
 
+    let playerScore = 0,
+        computerScore = 0;
 
-//* Función para crear un nuevo deck 
+    const animateAlert = {
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown animate__faster'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp animate__faster'
+        }
+    }
+    //* Referencias al HTML
 
-const createDeck = () => {
+    const btnPull = document.querySelector('#btnPull'),
+        btnNew = document.querySelector('#btnNew'),
+        btnStop = document.querySelector('#btnStop');
 
-    for (let i = 2; i <= 10; i++) {
+    const divCards = document.querySelectorAll('.divCards');
+
+    const scores = document.querySelectorAll('small');
+
+    //* Función para inciiar juego
+
+    const startGame = (numPlayers = 2) => {
+
+        deck = createDeck();
+        playersScore = [];
+
+        for (let i = 0; i < numPlayers; i++) {
+            playersScore.push(0);
+            scores[i].innerText = 0;
+            divCards[i].innerHTML = ''
+        }
+
+        btnPull.disabled = false;
+        btnStop.disabled = false;
+
+    }
+
+    //* Función para crear un nuevo deck 
+
+    const createDeck = () => {
+
+        deck = [];
+        for (let i = 2; i <= 10; i++) {
+            for (let kind of kinds) {
+                deck.push(i + kind)
+            }
+        }
+
         for (let kind of kinds) {
-            deck.push(i + kind)
-        }
-    }
-
-    for (let kind of kinds) {
-        for (let special of specials) {
-            deck.push(special + kind);
+            for (let special of specials) {
+                deck.push(special + kind);
+            }
         }
 
+        return _.shuffle(deck);
     }
 
-    deck = _.shuffle(deck);
-    console.log(deck);
 
-    return deck;
-}
+    //* Función para tomar una carta
 
-createDeck();
+    const pullCard = () => {
+        if (deck.length === 0) throw 'No hay cartas';
 
-//* Función para tomar una carta
+        return deck.pop();
+    }
 
-const pullCard = () => {
-    if (deck.length === 0) throw 'No hay cartas';
+    //* Función obtener el valor de la carta
 
-    let card = deck.pop();
-    return card;
+    const cardValue = (card) => {
+        const value = card.substring(0, card.length - 1);
 
-}
+        return (isNaN(value))
+            ? (value === 'A') ? 11 : 10
+            : value * 1
+    }
 
-//* Función obtener el valor de la carta
+    //* Función crear carta
 
-const cardValue = (card) => {
-    const value = card.substring(0, card.length - 1);
-
-    return (isNaN(value))
-        ? (value === 'A') ? 11 : 10
-        : value * 1
-}
-
-//* Función turno de la computadora
-
-const turnComputer = (minScores) => {
-
-    do {
-        const card = pullCard();
-        computerScore = computerScore + cardValue(card);
-        scores[1].innerText = computerScore;
+    const createCard = (card, turn) => {
 
         const imgCard = document.createElement('img');
         imgCard.src = `./assets/cards/${card}.png`;
         imgCard.classList.add('game-card');
-        divComputerCards.append(imgCard);
+        imgCard.classList.add('animate__animated');
+        imgCard.classList.add('animate__backInRight');
+        imgCard.classList.add('animate__faster');
+        divCards[turn].append(imgCard);
 
-        if (minScores > 21) break;
+    }
+    //* Función acumular puntos jugadores
 
-    } while ((computerScore <= minScores) && (computerScore <= 21));
+    const acumScore = (card, turn) => {
 
-    setTimeout(() => {
+        playersScore[turn] = playersScore[turn] + cardValue(card);
+        scores[turn].innerText = playersScore[turn];
+
+        return playersScore[turn];
+
+    }
+
+    //* Función turno de la computadora
+
+    const turnComputer = (minScores) => {
+
+        const turnPC = playersScore.length - 1;
+
+        do {
+            const card = pullCard();
+
+            computerScore = acumScore(card, turnPC);
+
+            createCard(card, turnPC);
+
+            if (minScores > 21) break;
+
+        } while ((computerScore <= minScores) && (computerScore < 21));
 
         isWinner(minScores, computerScore);
 
-    }, 500);
+    }
 
-}
+    //* Función  para definir ganador-perdedor-empate
 
-//* Función  para definir ganador-perdedor-empate
+    const isWinner = (playerScore, computerScore) => {
 
-const isWinner = (playerScore, computerScore) => {
+        setTimeout(() => {
 
-    if ((playerScore <= 21)) {
+            const { showClass, hideClass } = animateAlert;
 
-        if ((computerScore < 21) && (playerScore > computerScore) || computerScore > 21) {
-            alert('Ganastes');
-        } else if (computerScore === playerScore) {
-            alert(' Empate');
-        } else {
-            alert('Perdistes')
+            if ((playerScore <= 21)) {
+
+                if ((computerScore < 21) && (playerScore > computerScore) || computerScore > 21) {
+                    Swal.fire({
+                        title: 'Has ganado',
+                        showClass,
+                        hideClass
+                    });
+                } else if (computerScore === playerScore) {
+                    Swal.fire({
+                        title: 'Empate',
+                        showClass,
+                        hideClass
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Has perdido',
+                        showClass,
+                        hideClass
+                    });
+                }
+
+            } else {
+                Swal.fire({
+                    title: 'Has perdido',
+                    showClass,
+                    hideClass
+                });
+            }
+
+        }, 500);
+    }
+
+    //* Eventos
+
+    //* Halar cartas
+
+    btnPull.addEventListener('click', () => {
+
+        const card = pullCard();
+
+        playerScore = acumScore(card, 0);
+
+        createCard(card, 0);
+
+        if (playerScore > 21) {
+            btnPull.disabled = true;
+            btnStop.disabled = true;
+            turnComputer(playerScore);
+
+        } else if (playerScore === 21) {
+            btnPull.disabled = true;
+            btnStop.disabled = true;
+            turnComputer(playerScore);
+
         }
 
-    } else {
-        alert('Perdistes')
-    }
-}
+    });
 
-//* Eventos
+    //* Detener cartas
 
-//* Halar cartas
-
-btnPull.addEventListener('click', () => {
-
-    const card = pullCard();
-    playerScore = playerScore + cardValue(card);
-    scores[0].innerText = playerScore;
-
-    const imgCard = document.createElement('img');
-    imgCard.src = `./assets/cards/${card}.png`;
-    imgCard.classList.add('game-card');
-    divPlayerCards.append(imgCard);
-
-    if (playerScore > 21) {
+    btnStop.addEventListener('click', () => {
         btnPull.disabled = true;
         btnStop.disabled = true;
         turnComputer(playerScore);
-        // isWinner(playerScore, computerScore);
+    });
 
-    } else if (playerScore === 21) {
-        btnPull.disabled = true;
-        btnStop.disabled = true;
-        turnComputer(playerScore);
-        // isWinner(playerScore, computerScore);
+    //* Cargar nuevo juego( Se colocó en el HTML)
+
+    // btnNew.addEventListener('click', () => {
+
+    //     startGame();
+    // });
+
+    return {
+
+        newGame: startGame,
 
     }
-
-});
-
-//* Detener cartas
-
-btnStop.addEventListener('click', () => {
-    btnPull.disabled = true;
-    btnStop.disabled = true;
-    turnComputer(playerScore);
-    // isWinner(playerScore, computerScore);
-
-});
-
-//* Cargar nuevo juego
-
-btnNew.addEventListener('click', () => {
-    deck = [];
-    createDeck();
-    divComputerCards.innerHTML = '';
-    divPlayerCards.innerHTML = '';
-    playerScore = 0;
-    computerScore = 0;
-    scores[0].innerText = 0;
-    scores[1].innerText = 0;
-
-    btnPull.disabled = false;
-    btnStop.disabled = false;
-});
+})();
 
 
 
